@@ -1,0 +1,15 @@
+{
+  "name": "blank-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "archive": "ch5-cli archive -p html-test -d dist -o release"
+  },
+  "author": "SCM",
+  "license": "ISC",
+  "dependencies": {
+    "@crestron/ch5-utilities-cli": "^2.0.0"
+  }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+</head>
+<body>
+    Hello world
+    <button onclick="sendWebsocketCommand('On')">On</button>
+    <button onclick="sendWebsocketCommand('Off')">Off</button>
+    <br>
+    <div style="width: 100%; display: flex; flex-direction: row;">Enter WebSocket URL
+      <input id="userUrl" style="flex-grow: 1;" value="wss://"></input>
+      <button onclick="socket = connectToWebSocketServer(document.getElementById('userUrl').value)">Connect</button>
+      <button>Disconnect</button>
+    </div>
+
+
+<script>
+const address = "127.0.0.1"
+const port = "65000"
+
+
+let socket = null;
+let isConnected = false;
+let isConnecting = false;
+const reconnectInterval = 5000; // 2 seconds // change back
+
+const defaultUrl = `wss://${address}:${port}/Laputa`
+
+socket = connectToWebSocketServer(defaultUrl)
+
+// Function to handle the connection to the web server and repeatedly attempt connection if disconnected.
+function connectToWebSocketServer(url) {
+  console.log(url)
+  if (isConnected || isConnecting) return;
+  isConnecting = true;
+  socket = new WebSocket(url);
+
+  socket.onopen = () => {
+    isConnected = true;
+    isConnecting = false;
+    console.log(`Connected to WebSocket server at ${url}`)
+  };
+
+  socket.onclose = () => {
+    isConnected = false;
+    isConnecting = false;
+    console.log(`Disconnected from WebSocket server at ${url}`)
+    /*setTimeout(() => {
+      connectToWebSocketServer(`wss://${address}:${port}/Laputa`);
+    }, reconnectInterval);*/
+  };
+
+  socket.onerror = (error) => {
+    isConnected = false;
+    isConnecting = false;
+    console.error("WebSocket error:", error);
+    socket.close();
+    /*setTimeout(() => {
+      connectToWebSocketServer(`wss://${address}:${port}/Laputa`);
+    }, reconnectInterval);*/
+  };
+
+  socket.onmessage = (event) => {
+    // Parse string data packet as JSON object
+    //const jsonPacket = JSON.parse(event.data);
+    
+    console.log("Received message: ", event.data)
+
+  };
+  return socket
+}
+
+function disconnect() {
+  socket.close();
+  /*setTimeout(() => {
+    connectToWebSocketServer(`wss://${address}:${port}/Laputa`);
+  }, reconnectInterval);*/
+}
+
+console.log(socket)
+
+// Function to send websocket command
+function sendWebsocketCommand(value){
+  // Send the command object to the web socket only once socket is connected
+  function sendCommandWhenConnected() {
+      socket.send(value) // change back
+      console.log("Packet sent: ", value)
+  }
+  sendCommandWhenConnected();
+}
+
+// Send a ping message every 30 seconds to keep the connection alive
+/*setInterval(() => {
+  sendWebsocketCommand({ interactionType: 'ping', value: 'ping' });
+}, 30000);*/
+
+</script>
+</body>
+</html>
